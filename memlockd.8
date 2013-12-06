@@ -1,0 +1,53 @@
+.TH memlockd 8
+.SH NAME
+memlockd \- daemon to lock files in memory with mlock
+.SH SYNOPSIS
+\f3memlockd\f1 [ \f3\-c config-file\f1 ] [ \f3\-d\f1 ] [ \f3\-f\f1 ] [ \f3\-u user\f1 ]
+.br
+.SH DESCRIPTION
+This manual page documents briefly the
+.B memlockd
+command.
+.P
+It is used to lock system programs and config files in memory so that if a
+DOS attack is experienced then the chance of the sys\-admin regaining
+control of the system in a reasonable amount of time (and therefore having
+a reasonable chance of discovering the cause of the problem) is significantly
+increased.
+.SH OPTIONS
+The \f3\-c\f1 option is used to specify the fully-qualified path name to a
+config file that lists the names of files to lock, if the config file is not
+specified then it will default to \f3/etc/memlockd.cfg\f1. In any situation
+where a config file is used a directory can be used instead, for a directory
+every file ending in ".cfg" will be processed.
+
+The \f3\-d\f1 option specifies debugging mode, the program will not fork
+and will produce it's logging messages on stderr instead of via syslog.
+
+The \f3\-f\f1 option specifies foreground (non-daemon) mode, the program will
+not fork but will still log normally.
+
+The \f3\-u\f1 option specifies the name of a user to use for running ldd (for
+recursive operation).  Note that locking shared objects that are writable by
+non\-root is not safe, but using a different UID will reduce the risk.
+
+The config file will contain a number of fully qualified names of files to
+lock in RAM.  When locking shared objects and ELF binaries it is possible to
+prefix the file name with a \f3+\f1 character to indicate that memlockd should
+recursively lock all shared objects that the program requires and all shared
+objects that those objects require. When a file not found error doesn't matter
+(EG you want a single config file to have the file names for multiple
+architectures or systems) you can prefix the file name with a \f3?\f1
+character, in that case errors such as EPERM will still be logged.
+
+If a line in the config file starts with a \f3%\f1 character it will be taken
+as the name of a config file or directory to process.  Currently only one
+level of recursion is accepted.
+
+.TP
+.SH SEE ALSO
+.BR mlock (2),
+.BR mmap (1).
+.br
+.SH AUTHOR
+memlockd was written by Russell Coker <russell@coker.com.au>

@@ -1,0 +1,18 @@
+Source: memlockd
+Section: admin
+Priority: optional
+Maintainer: Russell Coker <russell@coker.com.au>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: memlockd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser
+Description: daemon to lock files into RAM
+ When a system starts paging excessively it may be impossible for the sysadmin 
+ to login for the purpose of killing the runaway processes (sometimes the 
+ login program times out due to thrashing).  Memlockd allows important system 
+ files (such as /bin/login, /bin/getty, and the admin shell) to be locked in 
+ memory so that there will be no delay in accessing executable pages.  In my 
+ tests this can decrease the time required for the administrator to login on a 
+ thrashing system by a factor of more than 3.

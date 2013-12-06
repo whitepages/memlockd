@@ -1,0 +1,18 @@
+This package was debianized by Russell Coker <russell@coker.com.au> on
+Fri,  9 Feb 2007 17:45:15 +1100.
+
+It was downloaded from http://www.coker.com.au/memlockd/
+
+Upstream Author: Russell Coker <russell@coker.com.au>
+
+Copyright: 2007-2011 Russell Coker <russell@coker.com.au>
+
+License:
+
+GPL 3
+
+
+The Debian packaging is (C) 2007, Russell Coker <russell@coker.com.au> and
+is licensed under the GPL v3, see `/usr/share/common-licenses/GPL-3'.
+
+

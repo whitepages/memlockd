@@ -1,0 +1,85 @@
+memlockd (1.1) unstable; urgency=high
+
+  * Use wheezy paths for shared objects on i386 and amd64.  Also added a new
+    config file option to not log file not found errors so we don't see i386
+    errors on amd64 and amd64 errors on i386.
+    Closes: #660321, #480915
+  * Added systemd service file.
+    Closes: #652386
+  * Added a run-parts style config directory, default is /etc/memlock.d and
+    the config file uses a % to chain to another file or directory.
+    Closes: #529265
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 16 Jun 2012 15:43:44 +1000
+
+memlockd (1.0) unstable; urgency=low
+
+  * Changed the default config to have library names that work on AMD64
+    and to include killall and ps.
+  * Better use of variables in the makefile.
+  * Put a copyright statement in the main source file and change the license
+    to GPLv3.
+  * Version 1.0, with no serious changes for 3 years it's good for that.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 11 Jan 2011 21:07:34 +1100
+
+memlockd (0.05) unstable; urgency=low
+
+  * Stopped including asm/page.h because we didn't use it since 0.03-0.2.
+    Closes: #479968
+
+ -- Russell Coker <russell@coker.com.au>  Wed,  7 May 2008 22:06:00 +1000
+
+memlockd (0.04-0.1) unstable; urgency=low
+
+  * Non-maintainer upload to solve release goal.
+  * Add LSB dependency header to init.d scripts (Closes: #468888).
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 29 Mar 2008 14:22:03 +0100
+
+memlockd (0.04) unstable; urgency=low
+
+  * Include changes from Robert S. Edmonds
+  * Fixed my email address in the Maintainer field.
+
+ -- Russell Coker <russell@coker.com.au>  Sun, 27 Jan 2008 15:57:00 +1100
+
+memlockd (0.03-0.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Compile with g++, not gcc -lstdc++; closes: #441449.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Sun, 09 Sep 2007 17:17:20 -0400
+
+memlockd (0.03-0.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Use sysconf(_SC_PAGESIZE) instead of PAGE_SIZE; closes: #418666.
+  * Add dependency on adduser; closes: #431529.
+  * Use invoke-rc.d; closes: #440574.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Wed, 05 Sep 2007 19:34:22 -0400
+
+memlockd (0.03) unstable; urgency=medium
+
+  * Fixed section and description.
+
+  * Made it write a pidfile, and also made the restart option of the init.d
+    script start a new instance unconditionally so the new instance can kill
+    the old.  This means that there is no window where memlockd is not
+    running.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 13 Mar 2007 19:12:00 +1100
+
+memlockd (0.02) unstable; urgency=medium
+
+  * Made it not recursively call ldd.  ldd does recursion.
+
+ -- Russell Coker <russell@coker.com.au>  Thu, 22 Feb 2007 09:25:00 +1100
+
+memlockd (0.01) unstable; urgency=medium
+
+  * Initial release
+
+ -- Russell Coker <russell@coker.com.au>  Fri, 16 Feb 2007 18:19:00 +1100
+
