@@ -19,8 +19,11 @@
 #include <stdarg.h>
 #include <dirent.h>
 
+#define VERSION "1.2"
+
 #define MAX_FILES 1024
-#define PIDFILE "/var/run/memlockd.pid"
+#define DEFAULT_CONFIG "/etc/memlockd.cfg"
+#define DEFAULT_PIDFILE "/var/run/memlockd.pid"
 
 typedef struct file_data
 {
@@ -35,7 +38,8 @@ FILE_DATA files[MAX_FILES];
 FILE_DATA new_files[MAX_FILES];
 int num_files = 0;
 int num_new_files = 0;
-const char * config = "/etc/memlockd.cfg";
+const char * config = DEFAULT_CONFIG;
+const char * pidfile = DEFAULT_PIDFILE;
 int debug = 0;
 int page_size = 0;
 uid_t uid = 0;
@@ -164,7 +168,7 @@ void map_file_dependencies(const char * const name, int no_error_non_exist)
   if(!uid || !gid)
     return;
   int pipe_fd[2];
-  
+
   if(pipe(pipe_fd) == -1)
   {
     log(LOG_ERR, "Can't create pipe, not recursing");
@@ -329,23 +333,40 @@ void parse_config(int)
 
 void usage()
 {
-  fprintf(stderr, "Usage: memlockd [-c config-file] [-d] [-f]\n"
+  fprintf(stderr, "Usage: memlockd [-c config-file] [-p pid-file] [-d] [-f]\n"
+                  "       -c specifies an alternate config file (default %s)\n"
+                  "       -p specifies an alternate pidfile (default %s)\n"
                   "       -d is for debugging mode (running in foreground and no syslog)\n"
-                  "       -f is for foreground mode with syslog logging\n");
+                  "       -f is for foreground mode with syslog logging\n"
+                  "       -v print the version\n"
+                  "       -? print this message\n",
+                  DEFAULT_CONFIG,
+                  DEFAULT_PIDFILE
+         );
   exit(1);
 }
+
+void version()
+{
+  fprintf(stderr, "memlockd version: %s\n", VERSION);
+  exit(1);
+}
+
 int main(int argc, char **argv)
 {
   int c, foreground = 0;
   pid_t old_pid = 0;
   page_size = (int) sysconf(_SC_PAGESIZE);
-  while(-1 != (c = getopt(argc, argv, "fdc:u:")) )
+  while(-1 != (c = getopt(argc, argv, "?vfdc:u:p:")) )
   {
     switch(char(c))
     {
       case '?':
       case ':':
         usage();
+      break;
+      case 'v':
+        version();
       break;
       case 'c':
         config = optarg;
@@ -355,6 +376,9 @@ int main(int argc, char **argv)
       break;
       case 'f':
         foreground = 1;
+      break;
+      case 'p':
+        pidfile = optarg;
       break;
       case 'u':
         struct passwd *pw = getpwnam(optarg);
@@ -382,14 +406,14 @@ int main(int argc, char **argv)
     chdir("/");
   if(write_pidfile)
   {
-    FILE *fp = fopen(PIDFILE, "r");
+    FILE *fp = fopen(pidfile, "r");
     char buf[20];
     if(fp)
     {
       if(fgets(buf, sizeof(buf), fp))
         old_pid = atoi(buf);
       else
-        log(LOG_ERR, "Can't read pidfile " PIDFILE);
+        log(LOG_ERR, "Can't read pidfile %s", pidfile);
       fclose(fp);
     }
   }
@@ -409,18 +433,18 @@ int main(int argc, char **argv)
     log(LOG_ERR, "Can't handle sighup");
   if(write_pidfile)
   {
-    FILE *fp = fopen(PIDFILE, "w");
+    FILE *fp = fopen(pidfile, "w");
     if(fp)
     {
       if(fprintf(fp, "%d", (int)getpid()) <= 0)
       {
-        log(LOG_ERR, "Can't write to " PIDFILE);
-        unlink(PIDFILE);
+        log(LOG_ERR, "Can't write to %s", pidfile);
+        unlink(pidfile);
       }
       fclose(fp);
     }
     else
-      log(LOG_ERR, "Can't open " PIDFILE " for writing");
+      log(LOG_ERR, "Can't open %s for writing", pidfile);
   }
   if(old_pid)
     kill(old_pid, SIGKILL);

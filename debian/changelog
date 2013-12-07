@@ -1,3 +1,10 @@
+memlockd (1.2) unstable; urgency=low
+
+  * allow multple deamons via cmdline option naming pidfile
+  * add -v option to report version
+
+ -- Devin Ben-Hur <dbenhur@whitepages.com>  Fri Dec  6 12:42:12 PST 2013
+
 memlockd (1.1.1) unstable; urgency=high
 
   * Made it work correctly with systemd, restarts via systemd and doesn't use
