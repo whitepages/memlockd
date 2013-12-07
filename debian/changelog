@@ -1,3 +1,10 @@
+memlockd (1.1.1) unstable; urgency=low
+
+  * allow multple deamons via cmdline option naming pidfile
+  * add -v option to report version
+
+ -- Devin Ben-Hur <dbenhur@whitepages.com>  Fri Dec  6 12:42:12 PST 2013
+
 memlockd (1.1) unstable; urgency=high
 
   * Use wheezy paths for shared objects on i386 and amd64.  Also added a new
