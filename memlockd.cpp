@@ -12,7 +12,6 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/mman.h>
-#include <asm/page.h>
 #include <stdarg.h>
 
 #define MAX_FILES 1024
