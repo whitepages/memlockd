@@ -5,7 +5,7 @@ WFLAGS=-Wall -W -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wcast-qua
 
 
 memlockd: memlockd.cpp
-	g++ -O2 memlockd.cpp -o memlockd $(WFLAGS)
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $(LDFLAGS) memlockd.cpp -o memlockd
 
 clean:
 	rm -f memlockd

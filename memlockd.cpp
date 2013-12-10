@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2007-2011 Russell Coker <russell@coker.com.au>
+ * Licensed under GPL v3
+ */
 #include <assert.h>
 #include <string.h>
 #include <sys/types.h>

@@ -1,3 +1,14 @@
+memlockd (1.0) unstable; urgency=low
+
+  * Changed the default config to have library names that work on AMD64
+    and to include killall and ps.
+  * Better use of variables in the makefile.
+  * Put a copyright statement in the main source file and change the license
+    to GPLv3.
+  * Version 1.0, with no serious changes for 3 years it's good for that.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 11 Jan 2011 21:07:34 +1100
+
 memlockd (0.05) unstable; urgency=low
 
   * Stopped including asm/page.h because we didn't use it since 0.03-0.2.

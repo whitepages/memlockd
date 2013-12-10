@@ -5,14 +5,14 @@ It was downloaded from http://www.coker.com.au/memlockd/
 
 Upstream Author: Russell Coker <russell@coker.com.au>
 
-Copyright: 2007 Russell Coker <russell@coker.com.au>
+Copyright: 2007-2011 Russell Coker <russell@coker.com.au>
 
 License:
 
-GPL 2
+GPL 3
 
 
 The Debian packaging is (C) 2007, Russell Coker <russell@coker.com.au> and
-is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+is licensed under the GPL v3, see `/usr/share/common-licenses/GPL-3'.
 
 
