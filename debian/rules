@@ -60,6 +60,7 @@ install: build
 	cp memlockd debian/memlockd/usr/sbin
 	cp memlockd.cfg debian/memlockd/etc
 	cp debian/memlockd-default debian/memlockd/etc/default/memlockd
+	cp memlockd.service debian/memlockd/lib/systemd/system/memlockd.service
 
 
 # Build architecture-independent files here.

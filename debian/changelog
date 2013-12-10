@@ -1,3 +1,17 @@
+memlockd (1.1) unstable; urgency=high
+
+  * Use wheezy paths for shared objects on i386 and amd64.  Also added a new
+    config file option to not log file not found errors so we don't see i386
+    errors on amd64 and amd64 errors on i386.
+    Closes: #660321, #480915
+  * Added systemd service file.
+    Closes: #652386
+  * Added a run-parts style config directory, default is /etc/memlock.d and
+    the config file uses a % to chain to another file or directory.
+    Closes: #529265
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 16 Jun 2012 15:43:44 +1000
+
 memlockd (1.0) unstable; urgency=low
 
   * Changed the default config to have library names that work on AMD64

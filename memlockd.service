@@ -1,0 +1,12 @@
+[Unit]
+Description=memlockd
+
+[Service]
+ExecStart=/usr/sbin/memlockd -f -u memlockd
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+StandardOutput=syslog
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
