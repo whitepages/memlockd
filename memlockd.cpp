@@ -16,6 +16,7 @@
 #include <stdarg.h>
 
 #define MAX_FILES 1024
+#define PIDFILE "/var/run/memlockd.pid"
 
 typedef struct file_data
 {
@@ -265,6 +266,7 @@ void usage()
 int main(int argc, char **argv)
 {
   int c;
+  pid_t old_pid = 0;
   while(-1 != (c = getopt(argc, argv, "dc:u:")) )
   {
     switch(char(c))
@@ -292,10 +294,28 @@ int main(int argc, char **argv)
       break;
     }
   }
-  if(!debug)
-    daemon(0, 0);
 
   openlog("memlockd", LOG_CONS, LOG_DAEMON);
+
+  int write_pidfile = 1;
+  if(debug || getuid())
+    write_pidfile = 0;
+
+  if(!debug)
+    daemon(0, 0);
+  if(write_pidfile)
+  {
+    FILE *fp = fopen(PIDFILE, "r");
+    char buf[20];
+    if(fp)
+    {
+      if(fgets(buf, sizeof(buf), fp))
+        old_pid = atoi(buf);
+      else
+        log(LOG_ERR, "Can't read pidfile " PIDFILE);
+      fclose(fp);
+    }
+  }
 
   if(mlockall(MCL_CURRENT|MCL_FUTURE) == -1)
   {
@@ -310,6 +330,23 @@ int main(int argc, char **argv)
   sa.sa_handler = parse_config;
   if(sigaction(SIGHUP, &sa, NULL))
     log(LOG_ERR, "Can't handle sighup");
+  if(!debug)
+  {
+    FILE *fp = fopen(PIDFILE, "w");
+    if(fp)
+    {
+      if(fprintf(fp, "%d", (int)getpid()) <= 0)
+      {
+        log(LOG_ERR, "Can't write to " PIDFILE);
+        unlink(PIDFILE);
+      }
+      fclose(fp);
+    }
+    else
+      log(LOG_ERR, "Can't open " PIDFILE " for writing");
+  }
+  if(old_pid)
+    kill(old_pid, SIGKILL);
   while(1)
     sleep(3600);
   return 0;

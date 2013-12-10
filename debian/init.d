@@ -37,7 +37,7 @@ case "$1" in
 		--exec $DAEMON
 	echo "$NAME."
 	;;
-  #reload)
+  reload)
 	#
 	#	If the daemon can reload its config files on the fly
 	#	for example by sending it SIGHUP, do it here.
@@ -45,10 +45,10 @@ case "$1" in
 	#	If the daemon responds to changes in its config file
 	#	directly anyway, make this a do-nothing entry.
 	#
-	# echo "Reloading $DESC configuration files."
-	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
-	#	/var/run/$NAME.pid --exec $DAEMON
-  #;;
+	echo "Reloading $DESC configuration files."
+	start-stop-daemon --stop --signal 1 --quiet --pidfile \
+		/var/run/$NAME.pid --exec $DAEMON
+  ;;
   force-reload)
 	#
 	#	If the "reload" option is implemented, move the "force-reload"
@@ -62,12 +62,9 @@ case "$1" in
 	|| exit 0
 	;;
   restart)
+	$0 start && exit 0
     echo -n "Restarting $DESC: "
-	start-stop-daemon --stop --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON
-	sleep 1
-	start-stop-daemon --start --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS
+	$DAEMON $DAEMON_OPTS
 	echo "$NAME."
 	;;
   *)
