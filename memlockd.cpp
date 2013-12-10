@@ -33,6 +33,7 @@ int num_files = 0;
 int num_new_files = 0;
 const char * config = "/etc/memlockd.cfg";
 int debug = 0;
+int page_size = 0;
 uid_t uid = 0;
 gid_t gid = 0;
 
@@ -83,9 +84,9 @@ int open_map(int fd, struct stat *sb, const char * const name)
     close(fd);
     return 0;
   }
-  if(sb->st_size % PAGE_SIZE)
-    new_files[num_new_files].map_size = sb->st_size - (sb->st_size % PAGE_SIZE)
-                                      + PAGE_SIZE;
+  if(sb->st_size % page_size)
+    new_files[num_new_files].map_size = sb->st_size - (sb->st_size % page_size)
+                                      + page_size;
   else
     new_files[num_new_files].map_size = sb->st_size;
   new_files[num_new_files].fd = fd;
@@ -267,6 +268,7 @@ int main(int argc, char **argv)
 {
   int c;
   pid_t old_pid = 0;
+  page_size = (int) sysconf(_SC_PAGESIZE);
   while(-1 != (c = getopt(argc, argv, "dc:u:")) )
   {
     switch(char(c))
