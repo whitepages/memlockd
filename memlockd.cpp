@@ -407,7 +407,7 @@ int main(int argc, char **argv)
   sa.sa_handler = parse_config;
   if(sigaction(SIGHUP, &sa, NULL))
     log(LOG_ERR, "Can't handle sighup");
-  if(!debug)
+  if(write_pidfile)
   {
     FILE *fp = fopen(PIDFILE, "w");
     if(fp)
