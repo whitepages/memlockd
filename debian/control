@@ -1,13 +1,13 @@
 Source: memlockd
 Section: admin
 Priority: optional
-Maintainer: Russell Coker <rjc@coker.com.au>
+Maintainer: Russell Coker <russell@coker.com.au>
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.2
 
 Package: memlockd
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser
 Description: daemon to lock files into RAM
  When a system starts paging excessively it may be impossible for the sysadmin 
  to login for the purpose of killing the runaway processes (sometimes the 
