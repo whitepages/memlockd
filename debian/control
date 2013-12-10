@@ -1,0 +1,12 @@
+Source: memlockd
+Section: unknown
+Priority: extra
+Maintainer: Russell Coker <rjc@coker.com.au>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: memlockd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
