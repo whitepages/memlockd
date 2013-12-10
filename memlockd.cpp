@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Russell Coker <russell@coker.com.au>
+ * Copyright (C) 2007-2012 Russell Coker <russell@coker.com.au>
  * Licensed under GPL v3
  */
 #include <assert.h>
@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <stdarg.h>
+#include <dirent.h>
 
 #define MAX_FILES 1024
 #define PIDFILE "/var/run/memlockd.pid"
@@ -100,9 +101,12 @@ int open_map(int fd, struct stat *sb, const char * const name)
   return 1;
 }
 
-int open_file(const char * const name)
+// return 0 for no file mapped and 1 for file mapped
+int open_file(const char * const name, int no_error_non_exist)
 {
   int fd = open(name, O_RDONLY);
+  if(fd == -1 && no_error_non_exist && errno == ENOENT)
+    return 0;
   if(fd == -1)
   {
     log(LOG_ERR, "Can't open file %s", name);
@@ -155,7 +159,7 @@ int open_file(const char * const name)
   return open_map(fd, &sb, name);
 }
 
-void map_file_dependencies(const char * const name)
+void map_file_dependencies(const char * const name, int no_error_non_exist)
 {
   if(!uid || !gid)
     return;
@@ -211,21 +215,51 @@ void map_file_dependencies(const char * const name)
     if(!tmp)
       continue;
     strtok(tmp, " ");
-    open_file(tmp);
+    open_file(tmp, no_error_non_exist);
   }
   fclose(fp);
   wait(&rc);
 }
 
-void parse_config(int)
+void parse_config_file(const char * const config_name, int recurse_count)
 {
-  FILE *fp = fopen(config, "r");
-  if(!fp)
+  struct stat sbuf;
+  if(stat(config_name, &sbuf))
   {
-    log(LOG_ERR, "Can't open config file %s", config);
+    log(LOG_ERR, "Can't stat \"%s\"", config_name);
     exit(1);
   }
-  num_new_files = 0;
+  if(S_ISDIR(sbuf.st_mode))
+  {
+    log(LOG_INFO, "Entering config dir \"%s\"", config_name);
+    DIR *dirp = opendir(config_name);
+    if(!dirp)
+    {
+      log(LOG_ERR, "Can't open config file/dir %s", config_name);
+      exit(1);
+    }
+    int rc;
+    struct dirent entry, *res;
+    while((rc = readdir_r(dirp, &entry, &res)) == 0 && res)
+    {
+      int len = strlen(entry.d_name);
+      if(len > 4 && !strcmp(".cfg", &entry.d_name[len - 4]))
+      {
+        char buf[1024];
+        snprintf(buf, sizeof(buf), "%s/%s", config_name, entry.d_name);
+        parse_config_file(buf, recurse_count);
+      }
+    }
+    if(rc)
+    {
+      log(LOG_ERR, "readdir_r() error for \"%s\"", config_name);
+      exit(1);
+    }
+    closedir(dirp);
+    return;
+  }
+  log(LOG_INFO, "Parsing config file \"%s\"", config_name);
+  FILE *fp = fopen(config_name, "r");
   char buf[BUF_SIZE];
   while(fgets(buf, BUF_SIZE, fp))
   {
@@ -235,22 +269,54 @@ void parse_config(int)
     if(buf[len] == '\n')
       buf[len] = 0;
     const char *ptr = buf;
-    int map_dependencies = 0;
+    int map_dependencies = 0, no_error_non_exist = 0;
+    if(*ptr == '%')
+    {
+      if(recurse_count > 1)
+      {
+        log(LOG_ERR, "Too much recursion, won't process \"%s\"", ptr+1);
+      }
+      else
+      {
+        ptr++;
+        log(LOG_INFO, "Recursion, entering \"%s\"", ptr);
+        parse_config_file(ptr, recurse_count + 1);
+        continue;
+      }
+    }
+    if(*ptr == '?')
+    {
+       ptr++;
+       no_error_non_exist = 1;
+    }
     if(*ptr == '+')
     {
        ptr++;
        map_dependencies = 1;
     }
+    if(*ptr == '?')
+    {
+       ptr++;
+       no_error_non_exist = 1;
+    }
     if(*ptr != '/')
       continue;
-    open_file(ptr);
+    open_file(ptr, no_error_non_exist);
     if(map_dependencies)
-      map_file_dependencies(ptr);
+      map_file_dependencies(ptr, no_error_non_exist);
   }
   fclose(fp);
+}
+
+void parse_config(int)
+{
+  num_new_files = 0;
+  parse_config_file(config, 0);
   for(int i = 0; i < num_files; i++)
+  {
     if(files[i].fd != -1)
       unmap_close_file(&files[i]);
+  }
   if(!num_new_files)
   {
     log(LOG_INFO, "No files to lock - exiting");
@@ -263,16 +329,17 @@ void parse_config(int)
 
 void usage()
 {
-  fprintf(stderr, "Usage: memlockd [-c config-file] [-d]\n"
-                  "       -d is for debugging mode (running in foreground)\n");
+  fprintf(stderr, "Usage: memlockd [-c config-file] [-d] [-f]\n"
+                  "       -d is for debugging mode (running in foreground and no syslog)\n"
+                  "       -f is for foreground mode with syslog logging\n");
   exit(1);
 }
 int main(int argc, char **argv)
 {
-  int c;
+  int c, foreground = 0;
   pid_t old_pid = 0;
   page_size = (int) sysconf(_SC_PAGESIZE);
-  while(-1 != (c = getopt(argc, argv, "dc:u:")) )
+  while(-1 != (c = getopt(argc, argv, "fdc:u:")) )
   {
     switch(char(c))
     {
@@ -285,6 +352,9 @@ int main(int argc, char **argv)
       break;
       case 'd':
         debug = 1;
+      break;
+      case 'f':
+        foreground = 1;
       break;
       case 'u':
         struct passwd *pw = getpwnam(optarg);
@@ -300,14 +370,16 @@ int main(int argc, char **argv)
     }
   }
 
-  openlog("memlockd", LOG_CONS, LOG_DAEMON);
+  openlog("memlockd", LOG_CONS | LOG_PID, LOG_DAEMON);
 
   int write_pidfile = 1;
-  if(debug || getuid())
+  if(debug || foreground || getuid())
     write_pidfile = 0;
 
-  if(!debug)
+  if(!debug && !foreground)
     daemon(0, 0);
+  else
+    chdir("/");
   if(write_pidfile)
   {
     FILE *fp = fopen(PIDFILE, "r");
