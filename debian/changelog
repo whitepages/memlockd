@@ -1,3 +1,14 @@
+memlockd (0.03) unstable; urgency=medium
+
+  * Fixed section and description.
+
+  * Made it write a pidfile, and also made the restart option of the init.d
+    script start a new instance unconditionally so the new instance can kill
+    the old.  This means that there is no window where memlockd is not
+    running.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 13 Mar 2007 19:12:00 +1100
+
 memlockd (0.02) unstable; urgency=medium
 
   * Made it not recursively call ldd.  ldd does recursion.

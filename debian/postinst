@@ -31,7 +31,7 @@ case "$1" in
 	fi
 
 	update-rc.d memlockd start 75 2 3 4 5 . stop 05 0 1 6 . >/dev/null || true
-	/etc/init.d/memlockd start
+	/etc/init.d/memlockd restart
 
     ;;
 

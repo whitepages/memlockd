@@ -59,6 +59,7 @@ install: build
 #	$(MAKE) DESTDIR=$(CURDIR)/debian/memlockd install
 	cp memlockd debian/memlockd/usr/sbin
 	cp memlockd.cfg debian/memlockd/etc
+	cp debian/memlockd-default debian/memlockd/etc/default/memlockd
 
 
 # Build architecture-independent files here.
