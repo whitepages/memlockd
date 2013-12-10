@@ -150,7 +150,7 @@ int open_file(const char * const name)
   return open_map(fd, &sb, name);
 }
 
-void recurse_file(const char * const name)
+void map_file_dependencies(const char * const name)
 {
   if(!uid || !gid)
     return;
@@ -206,9 +206,7 @@ void recurse_file(const char * const name)
     if(!tmp)
       continue;
     strtok(tmp, " ");
-    // if we open a file then recurse it's libraries
-    if(open_file(tmp))
-      recurse_file(tmp);
+    open_file(tmp);
   }
   fclose(fp);
   wait(&rc);
@@ -232,17 +230,17 @@ void parse_config(int)
     if(buf[len] == '\n')
       buf[len] = 0;
     const char *ptr = buf;
-    int recurse = 0;
+    int map_dependencies = 0;
     if(*ptr == '+')
     {
        ptr++;
-       recurse = 1;
+       map_dependencies = 1;
     }
     if(*ptr != '/')
       continue;
     open_file(ptr);
-    if(recurse)
-      recurse_file(ptr);
+    if(map_dependencies)
+      map_file_dependencies(ptr);
   }
   fclose(fp);
   for(int i = 0; i < num_files; i++)

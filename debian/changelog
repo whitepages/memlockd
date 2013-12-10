@@ -1,4 +1,10 @@
-memlockd (0.01) etch; urgency=medium
+memlockd (0.02) unstable; urgency=medium
+
+  * Made it not recursively call ldd.  ldd does recursion.
+
+ -- Russell Coker <russell@coker.com.au>  Thu, 22 Feb 2007 09:25:00 +1100
+
+memlockd (0.01) unstable; urgency=medium
 
   * Initial release
 
