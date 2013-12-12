@@ -2,7 +2,7 @@
 .SH NAME
 memlockd \- daemon to lock files in memory with mlock
 .SH SYNOPSIS
-\f3memlockd\f1 [ \f3\-c config-file\f1 ] [ \f3\-d\f1 ] [ \f3\-f\f1 ] [ \f3\-u user\f1 ]
+\f3memlockd\f1 [ \f3\-c config-file\f1 ] [ \f3\-p pid-file\f1 ] [ \f3\-d\f1 ] [ \f3\-f\f1 ] [ \f3\-v\f1 ] [ \f3\-u user\f1 ]
 .br
 .SH DESCRIPTION
 This manual page documents briefly the
@@ -21,11 +21,20 @@ specified then it will default to \f3/etc/memlockd.cfg\f1. In any situation
 where a config file is used a directory can be used instead, for a directory
 every file ending in ".cfg" will be processed.
 
+The \f3\-c\f1 option is used to specify the fully-qualified path name of the
+PID file that identifies a running daemon. If not specified it will default
+to \f3/var/run/memlockd.pid\f1. This is useful when running multiple memlockd
+daemons; for example, a stock system memlockd and an application specific
+memlockd being used to prevent swapping of some application critical data
+files.
+
 The \f3\-d\f1 option specifies debugging mode, the program will not fork
 and will produce it's logging messages on stderr instead of via syslog.
 
 The \f3\-f\f1 option specifies foreground (non-daemon) mode, the program will
 not fork but will still log normally.
+
+The \f3\-v\f1 option prints program name and version.
 
 The \f3\-u\f1 option specifies the name of a user to use for running ldd (for
 recursive operation).  Note that locking shared objects that are writable by
