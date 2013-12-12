@@ -3,7 +3,7 @@ memlockd (1.2) unstable; urgency=low
   * allow multple deamons via cmdline option naming pidfile
   * add -v option to report version
 
- -- Devin Ben-Hur <dbenhur@whitepages.com>  Fri Dec  6 12:42:12 PST 2013
+ -- Devin Ben-Hur <dbenhur@whitepages.com>  Fri, 06 Dec 2013 12:42:12 -0800
 
 memlockd (1.1.1) unstable; urgency=high
 
